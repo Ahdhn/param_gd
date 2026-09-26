@@ -4,7 +4,7 @@ if(NOT DEFINED CMAKE_CUDA_ARCHITECTURES)
     set(CMAKE_CUDA_ARCHITECTURES native)
 endif()
 
-project(RXMeshTemplate 
+project(Param
     LANGUAGES CXX CUDA)
 
 set(CMAKE_CXX_STANDARD 17)
@@ -36,5 +36,6 @@ if(NOT COMMAND rxmesh_add_app)
 endif()
 
 rxmesh_add_app(${PROJECT_NAME}
-    SOURCES main.cu
+    SOURCES param.cu
+    LIBS RXMesh CLI11::CLI11
 )
