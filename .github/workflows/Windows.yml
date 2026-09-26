@@ -1,0 +1,41 @@
+name: Windows
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  WindowsRun:
+    runs-on: windows-2022
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install CUDA
+        uses: Jimver/cuda-toolkit@v0.2.36
+        with:
+          cuda: '12.6.3'
+          use-local-cache: false
+          use-github-cache: false
+
+      - name: Show tool versions
+        run: |
+          nvcc --version
+          cmake --version
+
+      - name: Configure
+        run: >-
+          cmake -S "${{ github.workspace }}"
+          -B "${{ github.workspace }}/build"
+          -G "Visual Studio 17 2022"
+          -A x64
+          -DCMAKE_CUDA_ARCHITECTURES=89
+          -DRX_USE_POLYSCOPE=OFF
+
+      - name: Build
+        run: >-
+          cmake --build "${{ github.workspace }}/build"
+          --config Release
+          --target RXMeshTemplate
+          --parallel 2

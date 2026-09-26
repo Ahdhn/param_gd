@@ -1,0 +1,41 @@
+name: Ubuntu
+
+on: [push, pull_request, workflow_dispatch]
+
+permissions:
+  contents: read
+
+jobs:
+  UbuntuRun:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Install CUDA
+        uses: Jimver/cuda-toolkit@v0.2.36
+        with:
+          cuda: '12.6.0'
+          linux-local-args: '["--toolkit"]'
+          use-local-cache: false
+          use-github-cache: false
+
+      - name: Show tool versions
+        run: |
+          nvcc --version
+          cmake --version
+
+      - name: Configure
+        run: >-
+          cmake -S "${{ github.workspace }}"
+          -B "${{ github.workspace }}/build"
+          -DCMAKE_BUILD_TYPE=Release
+          -DCMAKE_CUDA_ARCHITECTURES=89
+          -DRX_USE_POLYSCOPE=OFF
+
+      - name: Build
+        run: >-
+          cmake --build "${{ github.workspace }}/build"
+          --config Release
+          --target RXMeshTemplate
+          --parallel 2
